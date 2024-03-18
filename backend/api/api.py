@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -31,3 +31,4 @@ todos = [
 @app.get("/todo", tags=["todos"])
 async def read_root() -> dict:
     return {"data": todos}
+

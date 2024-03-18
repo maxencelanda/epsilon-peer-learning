@@ -16,8 +16,8 @@ export default function Todos() {
 
     return (
         <div>
-            {todos.map((todo) => (
-                <p>{todo.item}</p>
+            {todos.map((todo, k) => (
+                <p key={k}>{todo.item}</p>
             ))}
         </div>
     )
