@@ -7,7 +7,7 @@ FastAPI (Python) + ReactJS
 
 # Packages
 Python:
-- ```pip install univorn==0.28.0```
+- ```pip install uvicorn==0.28.0```
 - ```pip install fastapi==0.110.0```
 
 React:
