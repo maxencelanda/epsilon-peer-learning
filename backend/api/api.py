@@ -33,10 +33,8 @@ todos = [
 async def read_root() -> dict:
     return {"data": todos}
 
-@app.post("/files/")
-async def create_file(file: Annotated[bytes, File()]):
-    return {"file_size": len(file)}
-
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile):
+async def create_upload_file(file: UploadFile | None = None):
+    if not file:
+        return {"message": "Aucun fichier upload"}
     return {"filename": file.filename}
