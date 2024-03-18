@@ -31,3 +31,4 @@ todos = [
 @app.get("/todo", tags=["todos"])
 async def read_root() -> dict:
     return {"data": todos}
+
