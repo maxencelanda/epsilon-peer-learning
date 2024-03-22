@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
+import sqlite3
 
 app = FastAPI()
 
