@@ -35,7 +35,8 @@ async def read_root() -> dict:
     return {"data": todos}
 
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile | None = None):
-    if not file:
+async def create_upload_file(fileUpload: UploadFile | None = None):
+    print(fileUpload)
+    if not fileUpload:
         return {"message": "Aucun fichier upload"}
-    return {"filename": file.filename}
+    return {"filename": fileUpload.filename}
