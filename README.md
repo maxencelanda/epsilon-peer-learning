@@ -10,7 +10,7 @@ Python:
 - ```pip install uvicorn==0.28.0```
 - ```pip install fastapi==0.110.0```
 - ```pip install python-multipart==0.0.9```
-- ```pip install mysql-connector-python```
+- ```pip install pymysql```
 
 React:
 - ```cd .\frontend\```
