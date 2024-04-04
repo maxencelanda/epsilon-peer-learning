@@ -40,3 +40,7 @@ async def create_upload_file(fileUpload: UploadFile | None = None):
     if not fileUpload:
         return {"message": "Aucun fichier upload"}
     return {"filename": fileUpload.filename}
+
+@app.get("/login")
+async def get_login() -> dict:
+    return {"data": ""}
