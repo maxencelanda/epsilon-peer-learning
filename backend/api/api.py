@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 import pymysql
+import os
 
 connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer")
 print(f"connected successfully to {connection}")
@@ -38,8 +39,15 @@ async def read_root() -> dict:
     return {"data": todos}
 
 @app.post("/uploadfile/")
-async def create_upload_file(fileUpload: UploadFile | None = None):
-    print(fileUpload)
-    if not fileUpload:
-        return {"message": "Aucun fichier upload"}
+async def create_upload_file(fileUpload: UploadFile = File(...)):
+    try:
+        fileToStore = await fileUpload.read()
+        current_path = os.path.dirname(os.path.abspath(__file__))
+        with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
+            f.write(fileToStore)
+    except Exception:
+        return {"message": "Problème dans l'envoi du fichier"}
+    finally:
+        fileUpload.file.close()
+    
     return {"filename": fileUpload.filename}
