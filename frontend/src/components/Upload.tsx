@@ -11,11 +11,11 @@ export default function Upload() {
     if (file != null){
       console.log(file[0])
       const formData = new FormData();
-      formData.append(
-        "fileUpload",
-        file[0]
-      );
-      const headers = {'Content-Type': file[0].type}
+      
+      for (let i = 0; i < file.length; i++){
+        formData.append("filesUpload", file[i]);
+      }
+      const headers = {'Content-Type': "multipart/form-data"}
       setUploading(true)
       const msg = await axios.post("http://localhost:8000/uploadfile",formData,headers);
       setUploading(false)
@@ -32,7 +32,7 @@ export default function Upload() {
 
   return (
     <div>
-      <input type="file" onChange={handleChange} name="fileUpload"/>
+      <input type="file" multiple onChange={handleChange} name="fileUpload" formEncType='multipart/form-data'/>
       <button type="submit" onClick={handleSubmit}>Upload</button>
       {uploading ? <p>Loading</p>: null}
       {message ? <p>{message}</p>: null}

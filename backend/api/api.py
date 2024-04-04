@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated
+from typing import List
 import pymysql
 import os
 
@@ -39,16 +39,16 @@ async def read_root() -> dict:
     return {"data": todos}
 
 @app.post("/uploadfile/")
-async def create_upload_file(fileUpload: UploadFile = File(...)):
-    try:
-        #fileToStore = await fileUpload.file.read()
-        current_path = os.path.dirname(os.path.abspath(__file__))
-        with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
-            while fileToStore := fileUpload.file.read(1024 * 1024):
-                f.write(fileToStore)
-    except Exception:
-        return {"message": "Problème dans l'envoi du fichier"}
-    finally:
-        fileUpload.file.close()
-    
-    return {"message": f"Fichier {fileUpload.filename} uploadé avec succès"}
+async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
+    for fileUpload in filesUpload:
+        try:
+            #fileToStore = await fileUpload.file.read()
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
+                while fileToStore := fileUpload.file.read(1024 * 1024):
+                    f.write(fileToStore)
+        except Exception:
+            return {"message": "Problème dans l'envoi du fichier"}
+        finally:
+            fileUpload.file.close()
+    return {"message": f"Fichier {[fileUpload.filename for fileUpload in filesUpload]} uploadé avec succès"}
