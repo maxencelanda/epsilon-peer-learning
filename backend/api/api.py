@@ -1,5 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Annotated
+import sqlite3
 
 app = FastAPI()
 
@@ -32,3 +34,13 @@ todos = [
 async def read_root() -> dict:
     return {"data": todos}
 
+@app.post("/uploadfile/")
+async def create_upload_file(fileUpload: UploadFile | None = None):
+    print(fileUpload)
+    if not fileUpload:
+        return {"message": "Aucun fichier upload"}
+    return {"filename": fileUpload.filename}
+
+@app.get("/login")
+async def get_login() -> dict:
+    return {"data": ""}
