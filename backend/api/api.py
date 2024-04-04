@@ -1,7 +1,13 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
-import sqlite3
+import mysql.connector
+
+mydb = mysql.connector.connect(
+  host="epsilonpeer2peer",
+  user="",
+  password=""
+)
 
 app = FastAPI()
 
@@ -40,7 +46,3 @@ async def create_upload_file(fileUpload: UploadFile | None = None):
     if not fileUpload:
         return {"message": "Aucun fichier upload"}
     return {"filename": fileUpload.filename}
-
-@app.get("/login")
-async def get_login() -> dict:
-    return {"data": ""}
