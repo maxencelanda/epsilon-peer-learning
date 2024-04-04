@@ -1,13 +1,10 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
-import mysql.connector
+import pymysql
 
-mydb = mysql.connector.connect(
-  host="epsilonpeer2peer",
-  user="",
-  password=""
-)
+connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer")
+print(f"connected successfully to {connection}")
 
 app = FastAPI()
 
