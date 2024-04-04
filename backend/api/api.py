@@ -41,13 +41,14 @@ async def read_root() -> dict:
 @app.post("/uploadfile/")
 async def create_upload_file(fileUpload: UploadFile = File(...)):
     try:
-        fileToStore = await fileUpload.read()
+        #fileToStore = await fileUpload.file.read()
         current_path = os.path.dirname(os.path.abspath(__file__))
         with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
-            f.write(fileToStore)
+            while fileToStore := fileUpload.file.read(1024 * 1024):
+                f.write(fileToStore)
     except Exception:
         return {"message": "Problème dans l'envoi du fichier"}
     finally:
         fileUpload.file.close()
     
-    return {"filename": fileUpload.filename}
+    return {"message": f"Fichier {fileUpload.filename} uploadé avec succès"}
