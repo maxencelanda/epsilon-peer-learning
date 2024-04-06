@@ -29,10 +29,7 @@ Pour run:
 
 - Ouvrir un terminal dans le dossier epsilon-peer-learning
 - `python .\backend\main.py` ou run le script main.py dans un IDE
-- `python .\backend\main.py` ou run le script main.py dans un IDE
 - Ouvrir un nouveau terminal dans le dossier epsilon-peer-learning
 - `cd .\frontend\`
 - `npm run dev`
 
-- `cd .\frontend\`
-- `npm run dev`
