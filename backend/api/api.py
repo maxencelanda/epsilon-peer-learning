@@ -3,14 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from pydantic import BaseModel
 import pymysql
+import pymysql.cursors
 from fastapi import HTTPException
 
 class Apprenant(BaseModel):
     email : str
-    password : int
+    password : str
 
 connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer",cursorclass=pymysql.cursors.DictCursor)
 print(f"connected successfully to {connection}")
+
+
+
 
 app = FastAPI()
 
@@ -46,6 +50,15 @@ todos = [
 async def read_root() -> dict:
     return {"data": todos}
 
+@app.get("/getstudents")
+async def get_students():
+    with connection:
+        with connection.cursor() as cursor:
+            sql = "select * from apprenant"
+            cursor.execute(sql)
+            allStudents = cursor.fetchall()
+    return allStudents
+
 @app.post("/uploadfile/")
 async def create_upload_file(fileUpload: UploadFile | None = None):
     print(fileUpload)
@@ -56,6 +69,12 @@ async def create_upload_file(fileUpload: UploadFile | None = None):
 @app.post("/registerDB")
 async def create_user(apprenant : Apprenant):
     try:
-        todos.append(apprenant)
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO apprenant (email, mdp) VALUES (%s, %s)"
+            cursor.execute(sql, (apprenant.email, apprenant.password))
+            connection.commit()
+        return {"message": "reussi"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return {"message": f"erreur: {str(e)}"}
+    
+

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Register () {
   const [email, setEmail] = useState('')
@@ -18,7 +18,7 @@ export default function Register () {
     )
     alert("envoyé" + resp)
   }
-
+  useEffect
   return (
     <div className='flex flex-col justify-center'>
       <label htmlFor='email'>Email :</label>
