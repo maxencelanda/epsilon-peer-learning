@@ -36,21 +36,6 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-todos = [
-    {
-        "id": "1",
-        "item": "Read a book."
-    },
-    {
-        "id": "2",
-        "item": "Cycle around town."
-    }
-]
-
-@app.get("/todo", tags=["todos"])
-async def read_root() -> dict:
-    return {"data": todos}
-
 @app.get("/getstudents")
 async def get_students():
     with connection:
