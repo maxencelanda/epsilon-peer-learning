@@ -1,12 +1,40 @@
-import { createContext } from "react";
-import { User } from "./useUser";
+import { createContext, useState, useEffect } from 'react'
 
-interface AuthContext {
-  user: User | null;
-  setUser: (user: User | null) => void;
+export const UserContext = createContext(null)
+
+export const UserProvider = ({ children }) => {
+    const [user, setUser] = useState()
+
+    useEffect(() => {
+        localStorage.setItem("cartItems", JSON.stringify(user));
+    }, [user]);
+
+    useEffect(() => {
+        const user = localStorage.getItem("user");
+        if (user) {
+          setUser(JSON.parse(user));
+        }
+    }, []);
+
+    const addUser = (usr) => {
+        const isUserinUsers = user === usr;
+        if (!isUserinUsers) {
+          setUser(usr);
+        }
+    };
+
+    const removeUser = () => {
+          setUser(null);
+    };
+
+    return (
+        <UserContext.Provider
+          value={{
+            user,
+            addUser,
+            removeUser,
+          }}>
+          {children}
+        </UserContext.Provider>
+    );
 }
-
-export const AuthContext = createContext<AuthContext>({
-  user: null,
-  setUser: () => {},
-});

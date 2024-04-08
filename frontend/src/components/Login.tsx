@@ -1,7 +1,7 @@
 import axios from 'axios'
-import { useState } from 'react'
-import { useAuth } from '../context/useAuth'
+import { useContext, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { UserContext } from '../context/AuthContext'
 
 export default function Login () {
   const [email, setEmail] = useState('')
@@ -9,8 +9,7 @@ export default function Login () {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
   
-  const { login } = useAuth()
-  // FAIRE CONTEXT POUR ISCONNECTED
+  const { addUser } = useContext(UserContext)
 
   const handleSubmit = async e => {
     const Apprenant = {
@@ -24,11 +23,7 @@ export default function Login () {
     console.log(resp.data["erreur"])
     if (resp.data["user"]){
       console.log("user connected", resp.data["user"]["Id_Apprenant"], resp.data["user"]["email"])
-      console.log(typeof(resp.data["user"]["Id_Apprenant"]))
-      login({
-        id: resp.data["user"]["Id_Apprenant"].toString(),
-        email: resp.data["user"]["email"],
-      })
+      addUser(resp.data["user"])
     }
     setLoading(false)
   }
