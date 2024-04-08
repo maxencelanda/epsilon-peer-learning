@@ -1,7 +1,8 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated
+from typing import List, Annotated
 from pydantic import BaseModel
+import os
 import pymysql
 import pymysql.cursors
 from fastapi import HTTPException
@@ -60,11 +61,19 @@ async def get_students():
     return allStudents
 
 @app.post("/uploadfile/")
-async def create_upload_file(fileUpload: UploadFile | None = None):
-    print(fileUpload)
-    if not fileUpload:
-        return {"message": "Aucun fichier upload"}
-    return {"filename": fileUpload.filename}
+async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
+    for fileUpload in filesUpload:
+        try:
+            #fileToStore = await fileUpload.file.read()
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
+                while fileToStore := fileUpload.file.read(1024 * 1024):
+                    f.write(fileToStore)
+        except Exception:
+            return {"message": "Problème dans l'envoi du fichier"}
+        finally:
+            fileUpload.file.close()
+    return {"message": f"Fichier {[fileUpload.filename for fileUpload in filesUpload]} uploadé avec succès"}
 
 @app.post("/registerDB")
 async def create_user(apprenant : Apprenant):
@@ -76,5 +85,3 @@ async def create_user(apprenant : Apprenant):
         return {"message": "reussi"}
     except Exception as e:
         return {"message": f"erreur: {str(e)}"}
-    
-
