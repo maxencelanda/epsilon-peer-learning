@@ -6,14 +6,14 @@ import bob from './assets/saturatedbob.png'
 
 import { Link, RouterProvider, createBrowserRouter } from 'react-router-dom'
 import Upload from './components/Upload.tsx'
-import Todos from './components/Todos.tsx'
 import Login from './components/Login.tsx'
 import Register from './components/Register.tsx'
+import Home from './components/Home.tsx'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Upload />,
+    element: <Home/>,
     errorElement: (
       <Link to='/'>
         <img src={bob} className='w-full h-full'></img>
@@ -21,8 +21,8 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: '/testapi',
-    element: <Todos />
+    path: '/upload',
+    element: <Upload/>
   },
   {
     path: '/login',
