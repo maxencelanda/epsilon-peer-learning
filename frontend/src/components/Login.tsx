@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { useState } from 'react'
+import { useAuth } from '../context/useAuth'
+import { Link } from 'react-router-dom'
 
 export default function Login () {
   const [email, setEmail] = useState('')
@@ -7,6 +9,7 @@ export default function Login () {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
   
+  const { login } = useAuth()
   // FAIRE CONTEXT POUR ISCONNECTED
 
   const handleSubmit = async e => {
@@ -20,7 +23,12 @@ export default function Login () {
     console.log(resp.data["user"])
     console.log(resp.data["erreur"])
     if (resp.data["user"]){
-      console.log("user connected") // faire le context
+      console.log("user connected", resp.data["user"]["Id_Apprenant"], resp.data["user"]["email"])
+      console.log(typeof(resp.data["user"]["Id_Apprenant"]))
+      login({
+        id: resp.data["user"]["Id_Apprenant"].toString(),
+        email: resp.data["user"]["email"],
+      })
     }
     setLoading(false)
   }
@@ -37,6 +45,7 @@ export default function Login () {
 
   return (
     <div>
+      <Link to="/" className='block my-5'>Back</Link>
       <input type="email" onChange={handleEmailChange} name="email" placeholder='Email' required/>
       <input type="password" onChange={handlePwdChange} name="pwd" placeholder='Mot de passe' required/>
       <button type="submit" onClick={handleSubmit}>Login</button>
