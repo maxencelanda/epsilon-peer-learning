@@ -1,17 +1,30 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List
-import pymysql
+from typing import List, Annotated
+from pydantic import BaseModel
 import os
+import pymysql
+import pymysql.cursors
+from fastapi import HTTPException
 
-connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer")
+class Apprenant(BaseModel):
+    email : str
+    password : str
+
+connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer",cursorclass=pymysql.cursors.DictCursor)
 print(f"connected successfully to {connection}")
 
+
+
+
 app = FastAPI()
+
+
 
 origins = [
     "http://localhost:5173",
     "http://localhost:5173/",
+    "http://localhost:5173/Register",
     "localhost:5173"
 ]
 
@@ -38,6 +51,15 @@ todos = [
 async def read_root() -> dict:
     return {"data": todos}
 
+@app.get("/getstudents")
+async def get_students():
+    with connection:
+        with connection.cursor() as cursor:
+            sql = "select * from apprenant"
+            cursor.execute(sql)
+            allStudents = cursor.fetchall()
+    return allStudents
+
 @app.post("/uploadfile/")
 async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
     for fileUpload in filesUpload:
@@ -52,3 +74,14 @@ async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
         finally:
             fileUpload.file.close()
     return {"message": f"Fichier {[fileUpload.filename for fileUpload in filesUpload]} uploadé avec succès"}
+
+@app.post("/registerDB")
+async def create_user(apprenant : Apprenant):
+    try:
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO apprenant (email, mdp) VALUES (%s, %s)"
+            cursor.execute(sql, (apprenant.email, apprenant.password))
+            connection.commit()
+        return {"message": "reussi"}
+    except Exception as e:
+        return {"message": f"erreur: {str(e)}"}
