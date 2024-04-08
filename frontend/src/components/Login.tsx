@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState } from 'react'
 
 export default function Login () {
@@ -6,8 +7,22 @@ export default function Login () {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
   
+  // FAIRE CONTEXT POUR ISCONNECTED
+
   const handleSubmit = async e => {
-    console.log(email, password)
+    const Apprenant = {
+      'email': email,
+      'password': password
+    }
+    setLoading(true)
+    const resp = await axios.post("http://localhost:8000/login", Apprenant);
+    setMessage(resp.data["message"])
+    console.log(resp.data["user"])
+    console.log(resp.data["erreur"])
+    if (resp.data["user"]){
+      console.log("user connected") // faire le context
+    }
+    setLoading(false)
   }
 
   const handleEmailChange = e => {
@@ -22,8 +37,8 @@ export default function Login () {
 
   return (
     <div>
-      <input type="email" onChange={handleEmailChange} name="email" required/>
-      <input type="password" onChange={handlePwdChange} name="pwd" required/>
+      <input type="email" onChange={handleEmailChange} name="email" placeholder='Email' required/>
+      <input type="password" onChange={handlePwdChange} name="pwd" placeholder='Mot de passe' required/>
       <button type="submit" onClick={handleSubmit}>Login</button>
       {loading ? <p>Loading</p>: null}
       {message ? <p>{message}</p>: null}

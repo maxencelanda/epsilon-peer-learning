@@ -18,7 +18,7 @@ export default function Register () {
     )
     alert("envoyé" + resp)
   }
-  useEffect
+  //useEffect
   return (
     <div className='flex flex-col justify-center'>
       <label htmlFor='email'>Email :</label>

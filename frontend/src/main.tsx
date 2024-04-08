@@ -32,6 +32,7 @@ const router = createBrowserRouter([
     path: '/register',
     element: <Register />
   }
+  // Faire profile: historiques des uploads, tri par fini / en cours / non traité
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
