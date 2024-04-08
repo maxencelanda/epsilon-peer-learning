@@ -1,11 +1,13 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function Register () {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordCheck, setPasswordCheck] = useState('')
   const [envoiValide, setEnvoiValide] = useState(false)
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (password == passwordCheck && password != '') {
@@ -24,9 +26,10 @@ export default function Register () {
     if (envoiValide == true) {
       try {
         await axios.post('http://localhost:8000/registerDB', Apprenant)
+        navigate('/Upload')
       } catch (e: any) {
         if (e.response && e.response.data) {
-          console.log(e.response.data.detail)
+          alert(e.response.data.detail)
         }
       }
     }
