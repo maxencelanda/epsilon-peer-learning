@@ -70,3 +70,15 @@ async def create_user(apprenant : Apprenant):
         return {"message": "reussi"}
     except Exception as e:
         return {"message": f"erreur: {str(e)}"}
+    
+@app.get("/login")
+async def get_user(apprenant: Apprenant):
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM Apprenant WHERE email = %s AND mdp = %s"
+            cursor.execute(sql, (apprenant.email, apprenant.password))
+            user = cursor.fetchone()
+            print(user)
+        return user
+    except Exception as e:
+        return {"message": "erreur"}
