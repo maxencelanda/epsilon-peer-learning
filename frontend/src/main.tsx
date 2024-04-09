@@ -9,33 +9,46 @@ import Upload from './components/Upload.tsx'
 import Login from './components/Login.tsx'
 import Register from './components/Register.tsx'
 import Home from './components/Home.tsx'
+import Layout from './components/Layout.tsx'
+import { UserProvider } from './context/AuthContext.tsx'
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <Home/>,
+    element: <Layout/>,
+    children: [
+      {
+        path: '/',
+        element: <Home/>
+      },
+      {
+        path: '/upload',
+        element: <Upload/>
+      },
+      {
+        path: '/login',
+        element: <Login />
+      },
+      {
+        path: '/register',
+        element: <Register />
+      }
+    ],
     errorElement: (
       <Link to='/'>
         <img src={bob} className='w-full h-full'></img>
       </Link>
     )
-  },
-  {
-    path: '/upload',
-    element: <Upload/>
-  },
-  {
-    path: '/login',
-    element: <Login />
-  },
-  {
-    path: '/register',
-    element: <Register />
   }
+  
+  // Faire profile: historiques des uploads, tri par fini / en cours / non traité
 ])
+
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <UserProvider>
+      <RouterProvider router={router} />
+    </UserProvider>
   </React.StrictMode>
 )

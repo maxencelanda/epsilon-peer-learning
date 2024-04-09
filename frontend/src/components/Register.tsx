@@ -34,6 +34,7 @@ export default function Register () {
       }
     }
   }
+  
   return (
     <div className='flex flex-col justify-center'>
       <h1>Créez un compte : </h1>
