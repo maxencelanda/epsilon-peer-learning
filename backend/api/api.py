@@ -79,9 +79,9 @@ async def create_user(apprenant : Apprenant):
             sql = "INSERT INTO apprenant (email, mdp) VALUES (%s, %s)"
             cursor.execute(sql, (apprenant.email, apprenant.password))
             connection.commit()
-        return {"message": "reussi"}
-    except Exception as e:
-        return {"message": f"erreur: {str(e)}"}
+            return {"message": "reussi"}
+        except Exception as e:
+            return {"message": f"erreur: {str(e)}"}
     
 @app.post("/login")
 async def get_user(apprenant: Apprenant):
