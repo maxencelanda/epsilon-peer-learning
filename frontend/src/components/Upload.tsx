@@ -15,7 +15,7 @@ export default function Upload() {
     if (file != null){
       const formData = new FormData();
 
-      formData.append("userId", user.id);
+      formData.append("userId", user.Id_Apprenant);
       for (let i = 0; i < file.length; i++){
         formData.append("filesUpload", file[i]);
       }
