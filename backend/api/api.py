@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Annotated
 from pydantic import BaseModel
@@ -10,9 +10,6 @@ from fastapi import HTTPException
 class Apprenant(BaseModel):
     email : str
     password : str
-
-connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer",cursorclass=pymysql.cursors.DictCursor)
-print(f"connected successfully to {connection}")
 
 app = FastAPI()
 
@@ -31,24 +28,35 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+def connnect_to_db():
+    connection = pymysql.connect(host="localhost", user="root", passwd="", database="epsilonpeer2peer",cursorclass=pymysql.cursors.DictCursor)
+    return connection
+
 @app.get("/getstudents")
 async def get_students():
+    connection = connnect_to_db()
     with connection:
         with connection.cursor() as cursor:
             sql = "select * from apprenant"
             cursor.execute(sql)
             allStudents = cursor.fetchall()
+    connection.close()
     return allStudents
 
 @app.post("/uploadfile/")
-async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
+async def create_upload_file(userId: str = Form(...), filesUpload: List[UploadFile] = File(...)):
     for fileUpload in filesUpload:
         try:
-            #fileToStore = await fileUpload.file.read()
             current_path = os.path.dirname(os.path.abspath(__file__))
-            with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
+            print(f"{current_path}/uploadedFiles/{userId}/{fileUpload.filename}")
+            if not os.path.exists(f"{current_path}/uploadedFiles/{userId}"):
+                os.makedirs(f"{current_path}/uploadedFiles/{userId}") # creer dossier s'il nexiste pas, pq ca le fait pas de base pitie??????
+                
+            with open(f"{current_path}/uploadedFiles/{userId}/{fileUpload.filename}", "wb") as f:
                 while fileToStore := fileUpload.file.read(1024 * 1024):
                     f.write(fileToStore)
+                    
+            connection = connnect_to_db()
             with connection.cursor() as cursor:
                 getHighestId = "SELECT MAX(Id_Publication) AS highestId FROM Publication"
                 cursor.execute(getHighestId)
@@ -59,8 +67,9 @@ async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
                 cursor.execute(sql, (idPublication ,fileUpload.filename, 1))
                 connection.commit()
                 sql = "INSERT INTO Rendu VALUES(%s, %s, 0, 0, 0)"
-                cursor.execute(sql, (1, idPublication))
+                cursor.execute(sql, (int(userId), idPublication))
                 connection.commit()
+                connection.close()
         except Exception:
             return {"message": "Problème dans l'envoi du fichier"}
         finally:
@@ -69,6 +78,7 @@ async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
 
 @app.post("/registerDB")
 async def create_user(apprenant : Apprenant):
+    connection = connnect_to_db()
     with connection.cursor() as cursor:
         sql = "select * from apprenant where email = %s"
         cursor.execute(sql, (apprenant.email,))
@@ -79,7 +89,11 @@ async def create_user(apprenant : Apprenant):
             sql = "INSERT INTO apprenant (email, mdp) VALUES (%s, %s)"
             cursor.execute(sql, (apprenant.email, apprenant.password))
             connection.commit()
-            return {"message": "reussi"}
+            sql = "SELECT Id_Apprenant, email FROM Apprenant WHERE email = %s"
+            cursor.execute(sql, (apprenant.email))
+            result = cursor.fetchone()
+            connection.close()
+            return {"message": "reussi", "user": result}
         except Exception as e:
             return {"message": f"erreur: {str(e)}"}
     
@@ -87,13 +101,32 @@ async def create_user(apprenant : Apprenant):
 async def get_user(apprenant: Apprenant):
     print(apprenant)
     try:
+        connection = connnect_to_db()
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM Apprenant WHERE email = %s AND mdp = %s"
+            sql = "SELECT Id_Apprenant, email FROM Apprenant WHERE email = %s AND mdp = %s"
             cursor.execute(sql, (apprenant.email, apprenant.password))
             user = cursor.fetchone()
             print(user)
+            connection.close()
         if not user:
             return {"message": "aucun utilisateur trouvé"}
         return {"message": "succes", "user": user}
+    except Exception as e:
+        return {"message": "erreur", "erreur": e}
+
+@app.post("/rendus")
+async def get_rendus(userId: str = Form(...)):
+    print(userId)
+    try:
+        connection = connnect_to_db()
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM Rendu WHERE Id_Apprenant = %s"
+            cursor.execute(sql, (userId))
+            rendus = cursor.fetchall()
+            print(rendus)
+            connection.close()
+        if not rendus:
+            return {"message": "aucun rendu trouvé", "rendus": []}
+        return {"message": "succes", "rendus": rendus}
     except Exception as e:
         return {"message": "erreur", "erreur": e}

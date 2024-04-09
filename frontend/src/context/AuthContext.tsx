@@ -1,30 +1,39 @@
 import { createContext, useState, useEffect } from 'react'
 
-export const UserContext = createContext(null)
+export const UserContext = createContext()
+
+function getInitialState(){
+  const user = localStorage.getItem("theUser")
+  return user ? JSON.parse(user): []
+}
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState()
+    const [user, setUser] = useState(getInitialState)
 
     useEffect(() => {
-        localStorage.setItem("cartItems", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
     }, [user]);
 
     useEffect(() => {
         const user = localStorage.getItem("user");
+        console.log(localStorage.getItem("user"))
         if (user) {
           setUser(JSON.parse(user));
         }
     }, []);
 
     const addUser = (usr) => {
-        const isUserinUsers = user === usr;
-        if (!isUserinUsers) {
+        if (!(usr === user)) {
           setUser(usr);
         }
     };
 
     const removeUser = () => {
-          setUser(null);
+      setUser(null);
+    };
+
+    const isConnected = () => {
+      return user.length == 0
     };
 
     return (
@@ -33,6 +42,7 @@ export const UserProvider = ({ children }) => {
             user,
             addUser,
             removeUser,
+            isConnected,
           }}>
           {children}
         </UserContext.Provider>
