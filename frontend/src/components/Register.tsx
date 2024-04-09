@@ -7,6 +7,7 @@ export default function Register () {
   const [password, setPassword] = useState('')
   const [passwordCheck, setPasswordCheck] = useState('')
   const [envoiValide, setEnvoiValide] = useState(false)
+  const [confirm, setConfirm] = useState(false)
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +36,8 @@ export default function Register () {
     }
   }
   return (
+    <>
+      <ConfirmDialog></ConfirmDialog>
     <div className='flex flex-col justify-center'>
       <h1>Créez un compte : </h1>
       <form onSubmit={handleSubmit}>
@@ -61,6 +64,7 @@ export default function Register () {
         />
         <button type='submit'>envoyer les données</button>
       </form>
-    </div>
+      </div>
+      </>
   )
 }
