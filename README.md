@@ -24,6 +24,10 @@ React:
 - `cd .\frontend\`
 - `npm install`
 
+MySQL:
+- Ouvrir localhost/phpmyadmin
+- Importer epsilonpeer2peer.sql dans une BDD du même nom
+
 Pour run:
 
 
