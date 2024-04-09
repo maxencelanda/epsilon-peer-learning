@@ -1,15 +1,24 @@
 import axios from 'axios'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserContext } from '../context/AuthContext'
 
 export default function Register () {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordCheck, setPasswordCheck] = useState('')
   const [envoiValide, setEnvoiValide] = useState(false)
-  let navigate = useNavigate();
+  const [message, setMessage] = useState('')
+
+  const { user, addUser } = useContext(UserContext)
+  const navigate = useNavigate();
+
+  if (user){
+    navigate('/')
+  }
 
   useEffect(() => {
+    setMessage('')
     if (password == passwordCheck && password != '') {
       setEnvoiValide(true)
     } else {
@@ -25,13 +34,18 @@ export default function Register () {
     }
     if (envoiValide == true) {
       try {
-        await axios.post('http://localhost:8000/registerDB', Apprenant)
-        navigate('/Upload')
+        const resp = await axios.post('http://localhost:8000/registerDB', Apprenant)
+        addUser(resp.data["user"])
+        console.log(resp.data["user"])
+        navigate('/')
       } catch (e: any) {
         if (e.response && e.response.data) {
           alert(e.response.data.detail)
+          setMessage("Erreur")
         }
       }
+    } else {
+      setMessage("Les mots de passe ne correspondent pas")
     }
   }
   
@@ -61,6 +75,7 @@ export default function Register () {
           required
         />
         <button type='submit'>envoyer les données</button>
+        {message ? <p>{message}</p>: null}
       </form>
     </div>
   )

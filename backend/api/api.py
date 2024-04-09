@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Annotated
 from pydantic import BaseModel
@@ -41,14 +41,18 @@ async def get_students():
     return allStudents
 
 @app.post("/uploadfile/")
-async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
+async def create_upload_file(userId: str = Form(...), filesUpload: List[UploadFile] = File(...)):
     for fileUpload in filesUpload:
         try:
-            #fileToStore = await fileUpload.file.read()
             current_path = os.path.dirname(os.path.abspath(__file__))
-            with open(f"{current_path}/uploadedFiles/{fileUpload.filename}", "wb") as f:
+            print(f"{current_path}/uploadedFiles/{userId}/{fileUpload.filename}")
+            if not os.path.exists(f"{current_path}/uploadedFiles/{userId}"):
+                os.makedirs(f"{current_path}/uploadedFiles/{userId}") # creer dossier s'il nexiste pas, pq ca le fait pas de base pitie??????
+                
+            with open(f"{current_path}/uploadedFiles/{userId}/{fileUpload.filename}", "wb") as f:
                 while fileToStore := fileUpload.file.read(1024 * 1024):
                     f.write(fileToStore)
+                    
             with connection.cursor() as cursor:
                 getHighestId = "SELECT MAX(Id_Publication) AS highestId FROM Publication"
                 cursor.execute(getHighestId)
@@ -59,7 +63,7 @@ async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
                 cursor.execute(sql, (idPublication ,fileUpload.filename, 1))
                 connection.commit()
                 sql = "INSERT INTO Rendu VALUES(%s, %s, 0, 0, 0)"
-                cursor.execute(sql, (1, idPublication))
+                cursor.execute(sql, (int(userId), idPublication))
                 connection.commit()
         except Exception:
             return {"message": "Problème dans l'envoi du fichier"}
@@ -79,7 +83,10 @@ async def create_user(apprenant : Apprenant):
             sql = "INSERT INTO apprenant (email, mdp) VALUES (%s, %s)"
             cursor.execute(sql, (apprenant.email, apprenant.password))
             connection.commit()
-            return {"message": "reussi"}
+            sql = "SELECT Id_Apprenant, email FROM Apprenant WHERE email = %s"
+            cursor.execute(sql, (apprenant.email))
+            result = cursor.fetchone()
+            return {"message": "reussi", "user": result}
         except Exception as e:
             return {"message": f"erreur: {str(e)}"}
     
@@ -88,7 +95,7 @@ async def get_user(apprenant: Apprenant):
     print(apprenant)
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM Apprenant WHERE email = %s AND mdp = %s"
+            sql = "SELECT Id_Apprenant, email FROM Apprenant WHERE email = %s AND mdp = %s"
             cursor.execute(sql, (apprenant.email, apprenant.password))
             user = cursor.fetchone()
             print(user)
