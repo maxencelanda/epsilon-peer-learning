@@ -69,8 +69,13 @@ async def create_upload_file(filesUpload: List[UploadFile] = File(...)):
 
 @app.post("/registerDB")
 async def create_user(apprenant : Apprenant):
-    try:
-        with connection.cursor() as cursor:
+    with connection.cursor() as cursor:
+        sql = "select * from apprenant where email = %s"
+        cursor.execute(sql, (apprenant.email,))
+        result = cursor.fetchall()
+        if result:
+            raise HTTPException(status_code=405, detail="Compte déja existant")
+        try:
             sql = "INSERT INTO apprenant (email, mdp) VALUES (%s, %s)"
             cursor.execute(sql, (apprenant.email, apprenant.password))
             connection.commit()
