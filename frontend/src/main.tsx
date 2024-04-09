@@ -11,6 +11,7 @@ import Register from './components/Register.tsx'
 import Home from './components/Home.tsx'
 import Layout from './components/Layout.tsx'
 import { UserProvider } from './context/AuthContext.tsx'
+import Profile from './components/Profile.tsx'
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: '/register',
         element: <Register />
+      },
+      {
+        path: '/profile',
+        element: <Profile />
       }
     ],
     errorElement: (

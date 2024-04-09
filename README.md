@@ -20,9 +20,7 @@ React:
 
 - `cd .\frontend\`
 - `npm install`
-
-- `cd .\frontend\`
-- `npm install`
+- `npm run dev`
 
 MySQL:
 - Ouvrir localhost/phpmyadmin
