@@ -35,3 +35,9 @@ Pour run:
 - `cd .\frontend\`
 - `npm run dev`
 
+# Problèmes connus et comment les régler
+- Quand on va sur la page de base en front, on est loggé même si on ne l'est pas (ça créer des problèmes si on essaye d'upload)
+- Solution: Logout puis se connecter/s'inscrire
+
+- L'upload peut renvoyer une erreure tout en ayant téléchargé le fichier au bon endroit
+- Solution: Un module doit être créé avec l'id 1 dans la base de donnée
